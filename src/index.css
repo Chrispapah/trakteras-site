@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Work+Sans:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+/* Fixed nav + notched devices: hash links land below the bar */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: max(8rem, calc(env(safe-area-inset-top, 0px) + 5.5rem));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@theme {
+  --color-primary: #004e34;
+  --color-on-primary: #ffffff;
+  --color-surface: #fbfbe2;
+  --color-background: #fbfbe2;
+  --color-on-surface: #1b1d0e;
+  --color-on-background: #1b1d0e;
+  --color-surface-container-low: #f5f5dc;
+  --color-surface-container: #efefd7;
+  --color-surface-container-high: #eaead1;
+  --color-surface-container-highest: #e4e4cc;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface-variant: #3f4943;
+  --color-tertiary-fixed: #b8f47a;
+  --color-on-tertiary-fixed-variant: #2c5000;
+  --color-primary-container: #006847;
+  --color-primary-fixed-dim: #84d7ae;
+  --color-outline: #6f7a72;
+  --color-outline-variant: #bec9c1;
+  --color-error: #ba1a1a;
+
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Work Sans", sans-serif;
+  --font-label: "Work Sans", sans-serif;
+
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+}
+
+@layer utilities {
+  .bg-primary-gradient {
+    background: linear-gradient(135deg, #004e34 0%, #006847 100%);
+  }
+  .glass-nav {
+    background-color: rgba(251, 251, 226, 0.8);
+    backdrop-filter: blur(12px);
+  }
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+body {
+  @apply bg-surface text-on-surface font-body min-w-0;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.font-headline {
+  font-family: var(--font-headline);
+}

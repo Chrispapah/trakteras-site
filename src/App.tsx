@@ -11,10 +11,13 @@ import {
   AlertCircle,
   Bell,
   Tractor,
-  LayoutDashboard,
+  Wheat,
   Receipt,
   Calendar,
-  Cloud
+  Cloud,
+  Mail,
+  ArrowUpRight,
+  LifeBuoy
 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { db, OperationType, handleFirestoreError } from './firebase';
@@ -22,6 +25,9 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import logoTrakteras from './assets/Trakteras Logo No Sub-01.png';
 import heroImageEng from './assets/trakteras_hero_image_ENG.png';
 import heroImageGr from './assets/trakteras_hero_image_GR.png';
+
+const CONTACT_EMAIL_INFO = 'info@trakteras.com';
+const CONTACT_EMAIL_SUPPORT = 'support.trakteras@trakteras.com';
 
 // Error Boundary Component
 interface ErrorBoundaryProps {
@@ -181,6 +187,9 @@ function AppContent() {
             <a href="#how-it-works" className="text-on-surface-variant font-medium hover:text-primary transition-colors py-2">
               {t('How it works', 'Πώς λειτουργεί')}
             </a>
+            <a href="#contact" className="text-on-surface-variant font-medium hover:text-primary transition-colors py-2">
+              {t('Contact', 'Επικοινωνία')}
+            </a>
             <button
               type="button"
               onClick={toggleLang}
@@ -244,6 +253,13 @@ function AppContent() {
                 className="block text-lg font-medium text-on-surface-variant py-3 px-2 rounded-xl hover:bg-surface-container/60 active:bg-surface-container"
               >
                 {t('How it works', 'Πώς λειτουργεί')}
+              </a>
+              <a
+                href="#contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-lg font-medium text-on-surface-variant py-3 px-2 rounded-xl hover:bg-surface-container/60 active:bg-surface-container"
+              >
+                {t('Contact', 'Επικοινωνία')}
               </a>
               <a
                 href="#waitlist"
@@ -356,13 +372,13 @@ function AppContent() {
               <div className="w-full md:w-1/2 order-2 md:order-1 min-w-0 max-w-xl mx-auto md:mx-0 md:max-w-none">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   <div className="bg-surface-container-high p-5 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-center text-center gap-3 sm:gap-4 aspect-square min-h-[140px]">
-                    <Tractor className="w-10 h-10 sm:w-12 sm:h-12 text-primary shrink-0" aria-hidden />
+                    <Wheat className="w-10 h-10 sm:w-12 sm:h-12 text-primary shrink-0" aria-hidden />
                     <p className="font-headline font-bold text-primary text-sm sm:text-base leading-tight">
                       {t('Your Fields', 'Τα χωράφια σας')}
                     </p>
                   </div>
                   <div className="bg-tertiary-fixed p-5 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-center text-center gap-3 sm:gap-4 aspect-square min-h-[140px]">
-                    <LayoutDashboard className="w-10 h-10 sm:w-12 sm:h-12 text-on-tertiary-fixed-variant shrink-0" aria-hidden />
+                    <Tractor className="w-10 h-10 sm:w-12 sm:h-12 text-on-tertiary-fixed-variant shrink-0" aria-hidden />
                     <p className="font-headline font-bold text-on-tertiary-fixed-variant text-sm sm:text-base leading-tight">
                       {t('Your Machinery', 'Τα μηχανήματά σας')}
                     </p>
@@ -593,40 +609,103 @@ function AppContent() {
             </p>
           </div>
         </section>
+
+        {/* Contact */}
+        <section
+          className="relative py-20 sm:py-28 md:py-32 px-4 sm:px-6 overflow-hidden border-t border-primary/10"
+          id="contact"
+        >
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-surface-container-low via-surface to-surface-container-low/60"
+            aria-hidden
+          />
+          <div className="pointer-events-none absolute -top-24 right-0 h-64 w-64 rounded-full bg-primary/5 blur-3xl md:right-[10%]" aria-hidden />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-48 w-48 rounded-full bg-tertiary-fixed/15 blur-3xl md:left-[5%]" aria-hidden />
+
+          <div className="relative max-w-5xl mx-auto">
+            <div className="text-left max-w-2xl mb-12 sm:mb-14">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-headline font-extrabold text-primary leading-[1.1] tracking-tight mb-4">
+                {t('Tell us how we can help.', 'Πείτε μας πώς μπορούμε να βοηθήσουμε.')}
+              </h2>
+              <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed">
+                {t(
+                  'Whether you are curious about Trakteras, exploring a partnership, or need help with the product - send a note. We reply to every message.',
+                  'Αν θέλετε να μάθετε περισσότερα για τον Traktera, είτε εξετάζετε πιθανή συνεργασία, είτε χρειάζεστε βοήθεια με το προϊόν - στείλτε μας μήνυμα. Απαντάμε σε κάθε μήνυμα.'
+                )}
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+              <a
+                href={`mailto:${CONTACT_EMAIL_INFO}`}
+                className="group relative flex flex-col rounded-3xl bg-surface-container-lowest/95 backdrop-blur-sm p-8 sm:p-10 border border-outline-variant/15 shadow-lg shadow-primary/5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/25 transition-all duration-300 text-left min-h-[200px]"
+              >
+                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-gradient text-white shadow-md shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
+                  <Mail className="h-7 w-7" aria-hidden />
+                </div>
+                <h3 className="font-headline font-bold text-xl sm:text-2xl text-on-background mb-2">
+                  {t('General & partnerships', 'Γενικά & συνεργασίες')}
+                </h3>
+                <p className="text-sm sm:text-base text-on-surface-variant leading-relaxed mb-6 flex-grow">
+                  {t(
+                    'Press inquiries, pilot opportunities, partnerships, or anything else about our company - contact us.',
+                    'Για θέματα Τύπου, πιλοτικές συνεργασίες, συνεργασίες ή οτιδήποτε αφορά την εταιρεία - επικοινωνήστε μαζί μας.'
+                  )}
+                </p>
+                <span className="inline-flex items-center gap-2 font-headline font-bold text-primary text-base sm:text-lg group-hover:gap-3 transition-all break-all">
+                  {CONTACT_EMAIL_INFO}
+                  <ArrowUpRight className="h-5 w-5 shrink-0 opacity-70 group-hover:opacity-100" aria-hidden />
+                </span>
+              </a>
+
+              <a
+                href={`mailto:${CONTACT_EMAIL_SUPPORT}`}
+                className="group relative flex flex-col rounded-3xl bg-surface-container-lowest/95 backdrop-blur-sm p-8 sm:p-10 border border-outline-variant/15 shadow-lg shadow-primary/5 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/25 transition-all duration-300 text-left min-h-[200px]"
+              >
+                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-container-high border-2 border-primary/20 text-primary group-hover:bg-primary/10 group-hover:scale-105 transition-all duration-300">
+                  <LifeBuoy className="h-7 w-7" aria-hidden />
+                </div>
+                <h3 className="font-headline font-bold text-xl sm:text-2xl text-on-background mb-2">
+                  {t('Product support', 'Υποστήριξη προϊόντος')}
+                </h3>
+                <p className="text-sm sm:text-base text-on-surface-variant leading-relaxed mb-6 flex-grow">
+                  {t(
+                    'Questions about using Trakteras, access, or technical issues.',
+                    'Ερωτήσεις για τη χρήση του Traktera, πρόσβαση ή τεχνικά θέματα.'
+                  )}
+                </p>
+                <span className="inline-flex items-center gap-2 font-headline font-bold text-primary text-base sm:text-lg group-hover:gap-3 transition-all break-all">
+                  {CONTACT_EMAIL_SUPPORT}
+                  <ArrowUpRight className="h-5 w-5 shrink-0 opacity-70 group-hover:opacity-100" aria-hidden />
+                </span>
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
       <footer className="bg-surface-container-low py-10 sm:py-12 border-t border-primary/5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-          <div className="flex flex-col gap-2 items-center md:items-start">
-            <a
-              href="#top"
-              className="inline-flex rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low tap-highlight-transparent"
-              aria-label={t('Trakteras - back to top', 'Trakteras - αρχική')}
-            >
-              <img
-                src={logoTrakteras}
-                alt=""
-                className="h-14 sm:h-16 md:h-20 w-auto max-w-[220px] sm:max-w-[240px] object-contain"
-                referrerPolicy="no-referrer"
-                width={240}
-                height={80}
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-            <p className="text-xs sm:text-sm text-on-surface-variant/60">
-              {t('© 2026 Trakteras. All rights reserved.', '© 2026 Trakteras. Με την επιφύλαξη παντός δικαιώματος.')}
-            </p>
-          </div>
-          <nav
-            className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-3 text-sm font-medium text-on-surface-variant/80"
-            aria-label={t('Footer links', 'Σύνδεσμοι υποσέλιδου')}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col items-center text-center gap-6">
+          <a
+            href="#top"
+            className="inline-flex rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-low tap-highlight-transparent"
+            aria-label={t('Trakteras - back to top', 'Trakteras - αρχική')}
           >
-            <a href="#" className="hover:text-primary transition-colors underline decoration-primary/20 underline-offset-4 py-1 min-h-[44px] inline-flex items-center">
-              {t('Contact', 'Επικοινωνία')}
-            </a>
-          </nav>
+            <img
+              src={logoTrakteras}
+              alt=""
+              className="h-14 sm:h-16 md:h-20 w-auto max-w-[220px] sm:max-w-[240px] object-contain"
+              referrerPolicy="no-referrer"
+              width={240}
+              height={80}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+          <p className="text-xs sm:text-sm text-on-surface-variant/60">
+            {t('© 2026 Trakteras. All rights reserved.', '© 2026 Trakteras. Με την επιφύλαξη παντός δικαιώματος.')}
+          </p>
         </div>
       </footer>
     </div>

@@ -27,7 +27,7 @@ import heroImageEng from './assets/trakteras_hero_image_ENG.png';
 import heroImageGr from './assets/trakteras_hero_image_GR.png';
 
 const CONTACT_EMAIL_INFO = 'info@trakteras.com';
-const CONTACT_EMAIL_SUPPORT = 'support.trakteras@trakteras.com';
+const CONTACT_EMAIL_SUPPORT = 'helpdesk@trakteras.com';
 
 // Error Boundary Component
 interface ErrorBoundaryProps {
@@ -136,7 +136,7 @@ function AppContent() {
     if (!email) return;
 
     setIsSubmitting(true);
-    const path = 'waitlist';
+    const path = 'waiting_list';
     try {
       await addDoc(collection(db, path), {
         email: email,

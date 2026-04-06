@@ -41,7 +41,7 @@ Connect the GitHub repository and deploy; no extra framework config is required 
 
 ## Firebase / waitlist
 
-Waitlist emails are written to the Firestore collection `waitlist` (see `src/App.tsx` and `firestore.rules`).
+Waitlist emails are written to the Firestore collection `waiting_list` (see `src/App.tsx` and `firestore.rules`).
 
 1. Create or use a Firebase project and enable **Firestore**.
 2. Copy your web app config into `firebase-applet-config.json` (or replace with env-based config later).

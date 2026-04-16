@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ErrorInfo, ReactNode } from 'react';
+import React, { useState, useEffect, useCallback, ErrorInfo, ReactNode } from 'react';
 import {
   Mic,
   Globe,
@@ -12,7 +12,7 @@ import {
   Bell,
   Tractor,
   Wheat,
-  Receipt,
+  Euro,
   Calendar,
   Cloud,
   Mail,
@@ -25,9 +25,12 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import logoTrakteras from './assets/Trakteras Logo No Sub-01.png';
 import heroImageEng from './assets/trakteras_hero_image_ENG.png';
 import heroImageGr from './assets/trakteras_hero_image_GR.png';
+import gisCongressBanner from './assets/gis-congress-2026.png';
 
 const CONTACT_EMAIL_INFO = 'info@trakteras.com';
 const CONTACT_EMAIL_SUPPORT = 'helpdesk@trakteras.com';
+
+const GIS_CONGRESS_URL = 'https://giscongress.aua.gr/el/';
 
 // Error Boundary Component
 interface ErrorBoundaryProps {
@@ -131,6 +134,19 @@ function AppContent() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const resetWaitlist = useCallback(() => {
+    setIsSubmitted(false);
+    setEmail('');
+  }, []);
+
+  /** Success state clears automatically so users are not stuck without refresh (also: “Got it” button). */
+  useEffect(() => {
+    if (!isSubmitted) return;
+    const ms = reduceMotion ? 12_000 : 8_000;
+    const id = window.setTimeout(resetWaitlist, ms);
+    return () => window.clearTimeout(id);
+  }, [isSubmitted, reduceMotion, resetWaitlist]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
@@ -152,6 +168,12 @@ function AppContent() {
 
   const motionEase = reduceMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const };
 
+  /** Greek copy is longer: tighter spacing + wrap on md–xl; same md breakpoint as EN (no extra taps). */
+  const isGr = lang === 'gr';
+  const navLinkClass = `font-medium hover:text-primary transition-colors py-2 whitespace-nowrap leading-tight ${
+    isGr ? 'text-[0.75rem] sm:text-[0.8125rem] lg:text-sm' : 'text-sm xl:text-base'
+  } text-on-surface-variant`;
+
   return (
     <div id="top" className="min-h-screen bg-surface selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
       {/* Navigation */}
@@ -159,52 +181,66 @@ function AppContent() {
         className={`fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-all duration-300 ${scrolled ? 'glass-nav border-b border-primary/5 py-3' : 'bg-transparent py-4 sm:py-6'}`}
         aria-label={t('Primary navigation', 'Κύρια πλοήγηση')}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <a
-              href="#top"
-              onClick={() => setIsMenuOpen(false)}
-              className="inline-flex shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface tap-highlight-transparent"
-              aria-label={t('Trakteras - back to top', 'Trakteras - αρχική')}
-            >
-              <img
-                src={logoTrakteras}
-                alt=""
-                className="h-14 sm:h-20 md:h-24 w-auto max-w-[min(100%,260px)] sm:max-w-[min(100%,280px)] object-contain object-left"
-                referrerPolicy="no-referrer"
-                width={280}
-                height={96}
-                decoding="async"
-              />
-            </a>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 sm:gap-6 min-w-0">
+          <a
+            href="#top"
+            onClick={() => setIsMenuOpen(false)}
+            className="inline-flex shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface tap-highlight-transparent"
+            aria-label={t('Trakteras - back to top', 'Trakteras - αρχική')}
+          >
+            <img
+              src={logoTrakteras}
+              alt=""
+              className={`h-12 w-auto sm:h-14 object-contain object-left ${
+                isGr
+                  ? 'max-w-[8.75rem] sm:max-w-[9.5rem] md:max-w-[10rem] lg:max-w-[11.5rem] xl:max-w-[14rem]'
+                  : 'max-w-[10rem] sm:max-w-[11rem] md:max-w-[13rem] lg:max-w-[15rem]'
+              } md:h-16`}
+              referrerPolicy="no-referrer"
+              width={280}
+              height={96}
+              decoding="async"
+            />
+          </a>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-8 shrink-0">
-            <a href="#features" className="text-on-surface-variant font-medium hover:text-primary transition-colors py-2">
+          <div
+            className={`hidden md:flex flex-1 min-w-0 items-center justify-end ${
+              isGr ? 'gap-x-1.5 gap-y-1 sm:gap-x-2 lg:gap-x-3 xl:gap-x-5 flex-wrap' : 'gap-4 lg:gap-6 xl:gap-8'
+            }`}
+          >
+            <a href="#features" className={navLinkClass}>
               {t('Features', 'Χαρακτηριστικά')}
             </a>
-            <a href="#how-it-works" className="text-on-surface-variant font-medium hover:text-primary transition-colors py-2">
+            <a href="#how-it-works" className={navLinkClass}>
               {t('How it works', 'Πώς λειτουργεί')}
             </a>
-            <a href="#contact" className="text-on-surface-variant font-medium hover:text-primary transition-colors py-2">
+            <a href="#news" className={navLinkClass}>
+              {t('News', 'Νέα')}
+            </a>
+            <a href="#contact" className={navLinkClass}>
               {t('Contact', 'Επικοινωνία')}
             </a>
             <button
               type="button"
               onClick={toggleLang}
-              className="flex items-center gap-2 px-3 py-2 min-h-[44px] rounded-lg border border-outline/20 hover:bg-surface-container transition-colors font-semibold text-sm"
+              className={`flex items-center gap-1.5 py-2 min-h-[44px] rounded-lg border border-outline/20 hover:bg-surface-container transition-colors font-semibold shrink-0 ${
+                isGr ? 'px-2 text-xs xl:text-sm' : 'px-3 text-sm'
+              }`}
             >
               <Globe className="w-4 h-4 shrink-0" aria-hidden />
               <span>{t('ENG / GR', 'GR / ENG')}</span>
             </button>
-            <a href="#waitlist" className="bg-primary-gradient text-white px-6 py-2.5 min-h-[44px] inline-flex items-center rounded-xl font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/10">
+            <a
+              href="#waitlist"
+              className={`bg-primary-gradient text-white py-2.5 min-h-[44px] inline-flex items-center rounded-xl font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/10 shrink-0 whitespace-nowrap ${
+                isGr ? 'px-3 text-xs xl:text-sm' : 'px-5 text-sm lg:text-base'
+              }`}
+            >
               {t('Join Waitlist', 'Λίστα Αναμονής')}
             </a>
           </div>
 
-          {/* Mobile Toggle */}
-          <div className="md:hidden flex items-center gap-1 shrink-0">
+          <div className="flex md:hidden items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={toggleLang}
@@ -226,7 +262,6 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -253,6 +288,13 @@ function AppContent() {
                 className="block text-lg font-medium text-on-surface-variant py-3 px-2 rounded-xl hover:bg-surface-container/60 active:bg-surface-container"
               >
                 {t('How it works', 'Πώς λειτουργεί')}
+              </a>
+              <a
+                href="#news"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-lg font-medium text-on-surface-variant py-3 px-2 rounded-xl hover:bg-surface-container/60 active:bg-surface-container"
+              >
+                {t('News', 'Νέα')}
               </a>
               <a
                 href="#contact"
@@ -284,10 +326,10 @@ function AppContent() {
               transition={motionEase}
               className="space-y-6 sm:space-y-8 min-w-0 text-left"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-bold uppercase tracking-wider">
-                <span className="relative flex h-2 w-2 shrink-0">
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-primary/10 text-primary text-sm sm:text-base md:text-lg font-bold uppercase tracking-wide">
+                <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0">
                   <span className="motion-reduce:animate-none animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-primary"></span>
                 </span>
                 {t('Coming Soon', 'Σύντομα Κοντά Σας')}
               </div>
@@ -496,7 +538,7 @@ function AppContent() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
               {[
                 { icon: CheckCircle2, label: t('Task tracking', 'Παρακολούθηση εργασιών') },
-                { icon: Receipt, label: t('Cost tracking', 'Παρακολούθηση κόστους') },
+                { icon: Euro, label: t('Cost tracking', 'Παρακολούθηση κόστους') },
                 { icon: Calendar, label: t('Field calendar', 'Ημερολόγιο βάσει πεδίου') },
                 { icon: Bell, label: t('Smart reminders', 'Έξυπνες υπενθυμίσεις') },
                 { icon: Mic, label: t('Voice-first', 'Αλληλεπίδραση με φωνή') },
@@ -543,6 +585,91 @@ function AppContent() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* News — upcoming appearance */}
+        <section className="bg-surface-container-low py-16 sm:py-20 md:py-24 px-4 sm:px-6" id="news" aria-labelledby="news-heading">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-left max-w-3xl mb-10 sm:mb-12 px-1">
+              <h2 id="news-heading" className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold text-on-background">
+                {t('News', 'Νέα')}
+              </h2>
+
+              <div className="mt-6 sm:mt-8 pl-1 sm:pl-2 border-l-[3px] border-primary/35 space-y-4 sm:space-y-5">
+                <p className="text-sm sm:text-base font-semibold tracking-wide text-primary">
+                  {t("You'll find us at:", 'Θα μας βρείτε στο:')}
+                </p>
+
+                <div className="space-y-1">
+                  <p className="font-headline font-bold text-xl sm:text-2xl md:text-3xl text-on-background leading-[1.2] text-balance">
+                    {t(
+                      '6th Conference on Geographic Information Systems',
+                      '6ο Συνέδριο Γεωγραφικών Πληροφοριακών Συστημάτων'
+                    )}
+                  </p>
+                  <p className="font-headline font-bold text-lg sm:text-xl md:text-2xl text-on-background/95 leading-snug text-balance">
+                    {t(
+                      'and Spatial Analysis in Agriculture and the Environment',
+                      'και Χωρικής Ανάλυσης στη Γεωργία και το Περιβάλλον'
+                    )}
+                  </p>
+                </div>
+
+                <div className="space-y-2.5 pt-1 text-base sm:text-lg text-on-surface-variant">
+                  <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <span className="select-none" aria-hidden>
+                      📅
+                    </span>
+                    <time dateTime="2026-05-19">{t('19 – 21 May 2026', '19 – 21 Μαΐου 2026')}</time>
+                  </p>
+                  <p className="flex flex-wrap items-start gap-x-2 gap-y-1 leading-relaxed">
+                    <span className="select-none shrink-0" aria-hidden>
+                      📍
+                    </span>
+                    <span>
+                      {t(
+                        'Conference Amphitheater, Agricultural University of Athens',
+                        'Συνεδριακό Αμφιθέατρο, Γεωπονικό Πανεπιστήμιο Αθηνών'
+                      )}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <article className="max-w-3xl rounded-2xl sm:rounded-3xl bg-surface-container-lowest border border-outline-variant/10 overflow-hidden shadow-sm shadow-primary/5 text-left">
+              <a
+                href={GIS_CONGRESS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-inset"
+              >
+                <img
+                  src={gisCongressBanner}
+                  alt={t(
+                    'Banner: 6th GIS conference — agriculture and environment, May 2026, Athens',
+                    'Banner: 6ο συνέδριο GIS — γεωργία και περιβάλλον, Μάιος 2026, Αθήνα'
+                  )}
+                  className="w-full h-auto object-cover object-center max-h-[min(52vw,320px)] sm:max-h-[280px]"
+                  loading="lazy"
+                  decoding="async"
+                  width={1200}
+                  height={400}
+                />
+              </a>
+              <div className="p-6 sm:p-8 md:p-10">
+                <a
+                  href={GIS_CONGRESS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary-gradient px-5 py-3 min-h-[48px] text-white font-bold text-sm sm:text-base hover:opacity-92 transition-opacity shadow-md shadow-primary/15"
+                >
+                  {t('Conference website', 'Ιστόσελίδα συνεδρίου')}
+                  <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 opacity-90" aria-hidden />
+                </a>
+              </div>
+            </article>
           </div>
         </section>
 
@@ -601,11 +728,18 @@ function AppContent() {
                   <p className="text-on-surface-variant text-sm sm:text-base leading-relaxed">
                     {t("We'll reach out as soon as we're ready for you.", "Θα επικοινωνήσουμε μαζί σας μόλις είμαστε έτοιμοι.")}
                   </p>
+                  <button
+                    type="button"
+                    onClick={resetWaitlist}
+                    className="mt-6 w-full sm:w-auto min-h-[48px] px-8 py-3 rounded-xl bg-primary text-white font-bold text-base hover:opacity-90 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+                  >
+                    {t('Got it', 'Εντάξει')}
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
             <p className="mt-6 text-on-surface-variant/60 text-xs sm:text-sm px-2">
-              {t('Join over 200+ farmers already on the list.', 'Γίνετε ένας από τους 200+ αγρότες στη λίστα μας.')}
+              {t('Join over 1000+ farmers already on the list.', 'Γίνετε ένας από τους 1000+ αγρότες στη λίστα μας.')}
             </p>
           </div>
         </section>
